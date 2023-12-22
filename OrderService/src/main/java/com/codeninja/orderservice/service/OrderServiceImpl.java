@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.codeninja.orderservice.entity.Order;
+import com.codeninja.orderservice.external.client.ProductService;
 import com.codeninja.orderservice.model.OrderRequest;
 import com.codeninja.orderservice.repository.OrderRepository;
 
@@ -17,6 +18,9 @@ public class OrderServiceImpl implements OrderService {
 
 	@Autowired
 	private OrderRepository repository;
+	
+	@Autowired
+	private ProductService productService;
 
 	/**
 	 * OrderEntity -> save the data with status order created. Product service to
@@ -28,7 +32,11 @@ public class OrderServiceImpl implements OrderService {
 	public long placeOrder(OrderRequest orderRequest) {
 
 		log.info("Placing order request : {}", orderRequest);
+		
+		log.info("Reducing the Quantity {} ", orderRequest.getQuantity());
+		productService.reduceQuantity(orderRequest.getProductId(), orderRequest.getQuantity());
 
+		log.info("Creating order with status CREATED");
 		Order order = Order.builder().productId(orderRequest.getProductId()).quantity(orderRequest.getQuantity())
 				.amount(orderRequest.getTotalAmount()).orderStatus("CREATED").orderDate(Instant.now()).build();
 
