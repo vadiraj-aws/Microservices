@@ -1,6 +1,8 @@
 package com.codeninja.orderservice;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
@@ -14,6 +16,8 @@ public class Test {
         ZonedDateTime zonedDateTime = instant.atZone(indiaTimeZone);
         
         System.out.println("Current time in India: " + zonedDateTime);
+        
+        System.out.println("----"+ LocalDateTime.now());
     }
 
 }

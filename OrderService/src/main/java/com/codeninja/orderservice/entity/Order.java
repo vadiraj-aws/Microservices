@@ -1,6 +1,6 @@
 package com.codeninja.orderservice.entity;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -32,7 +32,7 @@ public class Order {
 	private long quantity;
 
 	@Column(name="ORDER_DATE")
-	private Instant orderDate;
+	private LocalDateTime orderDate;
 
 	@Column(name = "STATUS")
 	private String orderStatus;

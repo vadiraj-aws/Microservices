@@ -12,14 +12,12 @@ public class CustomException extends RuntimeException {
 	private String errorCode;
 	private int status;
 	private ZonedDateTime timeStamp;
-	private String path;
 
 	public CustomException(String message, String errorCode, int status, ZonedDateTime date) {
 		super(message);
 		this.errorCode = errorCode;
 		this.status = status;
 		this.timeStamp = date;
-		this.path = path;
 	}
 
 }

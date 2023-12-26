@@ -1,6 +1,6 @@
 package com.codeninja.productservice.model;
 
-import java.time.Instant;
+import java.time.ZonedDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,6 +15,6 @@ public class ErrorResponse {
 	
 	private String errorMessage;
 	private String errorCode;
-	private Instant timeStamp;
+	private ZonedDateTime timeStamp;
 
 }
