@@ -7,5 +7,7 @@ import com.codeninja.paymentservice.entity.TransactionDetails;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<TransactionDetails, Long> {
+	
+	TransactionDetails findByOrderId(long orderId);
 
 }

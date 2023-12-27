@@ -1,4 +1,4 @@
-package com.codeninja.paymentservice.model;
+package com.codeninja.orderservice.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,11 +9,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PaymentRequest {
+public class PaymentResponse {
 
 	private long orderId;
 	private long amount;
 	private String referenceNumber;
 	private PaymentMode paymentMode;
 	private String paymentStatus;
+	
+	
 }

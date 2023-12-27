@@ -8,7 +8,7 @@ spring:
     config:
       server:
         git:
-          default-label: master
+          default-label: public-view
           uri: https://github.com/vadiraj-aws/Microservices
           clone-on-start: true
           

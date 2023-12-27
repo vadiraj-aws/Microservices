@@ -20,6 +20,7 @@ public class OrderResponse {
 	private String orderStatus;
 	private long amount;
 	private ProductDetails productDetails;
+	private PaymentDetails paymentDetails;
 
 	@Data
 	@Builder
@@ -33,6 +34,19 @@ public class OrderResponse {
 		@JsonIgnore
 		private long price;
 
+	}
+	
+	@Data
+	@AllArgsConstructor
+	@NoArgsConstructor
+	@Builder
+	public static class PaymentDetails {
+		@JsonIgnore
+		private long orderId;
+		private long amount;
+		private String referenceNumber;
+		private PaymentMode paymentMode;
+		private String paymentStatus;
 	}
 
 }
