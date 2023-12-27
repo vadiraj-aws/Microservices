@@ -2,6 +2,7 @@ server:
   port: 8080
   
 spring:
+  timezone: Asia/Kolkata
   datasource:
     url: jdbc:mysql://${DB_HOST:localhost}:3306/productdb
     username: root
@@ -16,8 +17,36 @@ spring:
   config:
     import: configserver:http://localhost:9296 
     
-  timezone: Asia/Kolkata
+  output:
+    ansi:
+      enabled: always
       
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          config: DEBUG
+      web:
+            servlet:
+              DispatcherServlet: DEBUG
+  pattern:
+    level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'
+    
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  tracing:
+    sampling:
+      probability: 1.0
+  metrics:
+    distribution:
+      percentiles-histogram:
+        greeting: true
+      
+          
 #eureka:
 #  instance:
 #    prefer-ip-address: true

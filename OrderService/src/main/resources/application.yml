@@ -2,6 +2,7 @@ server:
   port: 8082
 
 spring:
+  timezone: Asia/Kolkata
   application:
     name: ORDER-SERVICE
   datasource:
@@ -15,8 +16,34 @@ spring:
       ddl-auto: update
   config:
     import: configserver:http://localhost:9296 
-    
-  timezone: Asia/Kolkata
+  output:
+    ansi:
+      enabled: always
+  
+logging:
+    level:
+      org:
+        springframework:
+          cloud:
+            config: DEBUG
+          web:
+            servlet:
+              DispatcherServlet: DEBUG
+    pattern:
+      level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'
+      
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  tracing:
+    sampling:
+      probability: 1.0
+  metrics:
+    distribution:
+      percentiles-histogram:
+        greeting: true
       
 #erueka:
 #  instance:
