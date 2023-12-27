@@ -1,0 +1,47 @@
+server:
+  port: 8084
+  
+spring:
+  timezone: Asia/Kolkata
+  application:
+    name: PAYMENT-SERVICE
+  datasource:
+    url:  jdbc:mysql://${DB_HOST:localhost}:3306/paymentdb
+    username: root
+    password: admin
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update
+  config:
+    import: configserver:http://localhost:9296
+  output:
+    ansi:
+      enabled: always
+      
+logging:
+  level:
+    org:
+       springframework:
+         cloud:
+           config: DEBUG
+       web:
+         servlet:
+           DispatherServlet: DEBUG
+  pattern:
+    level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'
+      
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  tracing:
+    sampling:
+      probability: 1.0
+  metrics:
+    distribution:
+      percentiles-histogram:
+        greeting: true
+     

@@ -4,11 +4,18 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import com.codeninja.orderservice.entity.Order;
+import com.codeninja.orderservice.exception.CustomException;
+import com.codeninja.orderservice.external.client.PaymentService;
 import com.codeninja.orderservice.external.client.ProductService;
 import com.codeninja.orderservice.model.OrderRequest;
+import com.codeninja.orderservice.model.OrderResponse;
+import com.codeninja.orderservice.model.PaymentRequest;
+import com.codeninja.orderservice.model.ProductResponse;
 import com.codeninja.orderservice.repository.OrderRepository;
 import com.codeninja.orderservice.util.DateTimeUtil;
 
@@ -23,6 +30,12 @@ public class OrderServiceImpl implements OrderService {
 	
 	@Autowired
 	private ProductService productService;
+	
+	@Autowired
+	private PaymentService paymentService;
+	
+	@Autowired
+	private RestTemplate restTemplate;
 
 	/**
 	 * OrderEntity -> save the data with status order created. Product service to
@@ -44,10 +57,61 @@ public class OrderServiceImpl implements OrderService {
 				.build();
 
 		order = repository.save(order);
+		
+		log.info("Calling Payment Service to complete the payment ");
+		
+		PaymentRequest paymentRequest = PaymentRequest.builder()
+				.orderId(order.getId())
+				.amount(order.getAmount())
+				.paymentMode(orderRequest.getPaymentMode())
+				.build();
+		
+		String orderStatus = null;
+		try {
+			paymentService.doPayment(paymentRequest);
+			log.info("Payment done successfully, changing order status to PLACED");
+			orderStatus = "PLACED";
+		} catch (Exception e) {
+			log.error("Error occured in payment. changind order status to FAILED");
+			orderStatus = "FAILED";
+		}
+		
+		order.setOrderStatus(orderStatus);
+		repository.save(order);
 
 		log.info("Order placed successfully with order id : {}", order.getId());
-
+		
 		return order.getId();
+	}
+
+	@Override
+	public OrderResponse getOrderDetails(long id) {
+		log.info("Get order details for orderId : {}", id);
+		
+		Order order = repository.findById(id).orElseThrow(() -> new CustomException("Order not found for Id : " + id,
+				"NOT_FOUND", 404, DateTimeUtil.getZonedDateTime()));
+		
+		log.info("Invoking Product Service to fetch  the product for id : {}" + order.getProductId());
+		
+		ProductResponse productResponse = restTemplate
+				.getForObject("http://PRODUCT-SERVICE/product/" + order.getProductId(), ProductResponse.class);
+		
+		
+		OrderResponse.ProductDetails productDetails= OrderResponse.ProductDetails.builder()
+			.productId(productResponse.getProductId())
+			.productName(productResponse.getProductName())
+			.quantity(productResponse.getQuantity())
+			.price(productResponse.getPrice())
+			.build();
+		
+		return OrderResponse.builder()
+				.amount(order.getAmount())
+				.orderDate(order.getOrderDate())
+				.orderStatus(order.getOrderStatus())
+				.orderId(order.getId())
+				.productDetails(productDetails)
+				.build();
+		
 	}
 
 }
