@@ -15,6 +15,7 @@ import com.codeninja.orderservice.external.client.ProductService;
 import com.codeninja.orderservice.model.OrderRequest;
 import com.codeninja.orderservice.model.OrderResponse;
 import com.codeninja.orderservice.model.PaymentRequest;
+import com.codeninja.orderservice.model.PaymentResponse;
 import com.codeninja.orderservice.model.ProductResponse;
 import com.codeninja.orderservice.repository.OrderRepository;
 import com.codeninja.orderservice.util.DateTimeUtil;
@@ -104,12 +105,24 @@ public class OrderServiceImpl implements OrderService {
 			.price(productResponse.getPrice())
 			.build();
 		
+		log.info("Invoking payment details for order id : {} ", order.getId());
+		PaymentResponse paymentResponse = restTemplate
+				.getForObject("http://PAYMENT-SERVICE/payment/"+order.getId(), PaymentResponse.class);
+		
+		OrderResponse.PaymentDetails paymentDetails = OrderResponse.PaymentDetails.builder()
+				.amount(paymentResponse.getAmount())
+				.paymentMode(paymentResponse.getPaymentMode())
+				.paymentStatus(paymentResponse.getPaymentStatus())
+				.referenceNumber(paymentResponse.getReferenceNumber())
+				.build();
+		
 		return OrderResponse.builder()
 				.amount(order.getAmount())
 				.orderDate(order.getOrderDate())
 				.orderStatus(order.getOrderStatus())
 				.orderId(order.getId())
 				.productDetails(productDetails)
+				.paymentDetails(paymentDetails)
 				.build();
 		
 	}
