@@ -1,0 +1,53 @@
+server:
+  port: 9090
+  
+spring:
+  application:
+    name: API-GATEWAY
+  config:
+    import: configserver:http://localhost:9296 
+  cloud:
+    gateway:
+      mvc:
+        routes:
+          - id: ORDER-SERVICE
+            uri: lb://ORDER-SERVICE
+            predicates:
+              - Path=/order/**
+          - id: PRODUCT-SERVICE
+            uri: lb://PRODUCT-SERVICE
+            predicates:
+              - Path=/product/**
+          - id: PAYMENT-SERVICE
+            uri: lb://PAYMENT-SERVICE
+            predicates:
+              - Path=/payment/**
+  output:
+    ansi:
+      enabled: always
+      
+logging:
+    level:
+      org:
+        springframework:
+          cloud:
+            config: DEBUG
+          web:
+            servlet:
+              DispatcherServlet: DEBUG
+    pattern:
+      level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'
+      
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  tracing:
+    sampling:
+      probability: 1.0
+  metrics:
+    distribution:
+      percentiles-histogram:
+        greeting: true
+    
