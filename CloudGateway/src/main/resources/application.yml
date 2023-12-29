@@ -8,20 +8,46 @@ spring:
     import: configserver:http://localhost:9296 
   cloud:
     gateway:
-      mvc:
         routes:
           - id: ORDER-SERVICE
             uri: lb://ORDER-SERVICE
             predicates:
               - Path=/order/**
+            filters:
+            - name: CircuitBreaker
+              args:
+                name: ORDER-SERVICE
+                fallbackuri: forward:/orderServiceFallback
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 1
           - id: PRODUCT-SERVICE
             uri: lb://PRODUCT-SERVICE
             predicates:
               - Path=/product/**
+            filters:
+            - name: CircuitBreaker
+              args:
+                name: PRODUCT-SERVICE
+                fallbackuri: forward:/productServiceFallback
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 1
           - id: PAYMENT-SERVICE
             uri: lb://PAYMENT-SERVICE
             predicates:
               - Path=/payment/**
+            filters:
+            - name: CircuitBreaker
+              args:
+                name: PAYMENT-SERVICE
+                fallbackuri: forward:/paymentServiceFallback
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 1               
   output:
     ansi:
       enabled: always
@@ -31,10 +57,10 @@ logging:
       org:
         springframework:
           cloud:
-            config: DEBUG
+            config: INFO
           web:
             servlet:
-              DispatcherServlet: DEBUG
+              DispatcherServlet: INFO
     pattern:
       level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'
       

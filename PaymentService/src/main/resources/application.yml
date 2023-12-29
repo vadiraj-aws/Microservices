@@ -25,10 +25,10 @@ logging:
     org:
        springframework:
          cloud:
-           config: DEBUG
+           config: INFO
        web:
          servlet:
-           DispatherServlet: DEBUG
+           DispatherServlet: INFO
   pattern:
     level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'
       
